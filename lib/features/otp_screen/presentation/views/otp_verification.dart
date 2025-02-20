@@ -22,15 +22,20 @@ class _OtpScreenState extends State<OtpScreen> {
   TextEditingController otp2Controller = TextEditingController();
   TextEditingController otp3Controller = TextEditingController();
   TextEditingController otp4Controller = TextEditingController();
-
+  @override
+  void initState() {
+    super.initState();
+    context.read<OtpCubit>().sendOTP();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: BlocListener<OtpCubit, OtpState>(
         listener: (context, state) async {
           if (state is OTPVerified) {
-            if (widget.successRoute == "fromLogin") {
-              // 🔹 Fetch role from Firestore only if OTP is from login
+            if (widget.successRoute == "verifyForPassword") {
+              Navigator.pop(context, true);
+            } else if (widget.successRoute == "fromLogin") {
               String role = await _fetchUserRole();
               context.go("/homeNavBar", extra: role);
             } else {

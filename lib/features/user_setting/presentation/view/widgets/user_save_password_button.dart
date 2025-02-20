@@ -61,7 +61,7 @@ class UserSavePasswordButton extends StatelessWidget {
               .update({
             'lastPasswordGenerationTime': timestamp.millisecondsSinceEpoch
           });
-              ShowToast("Password saved successfully");
+          ShowToast("Please close app and open it again to see the changes");
 
           // Navigate to home
           if (!context.mounted) return;

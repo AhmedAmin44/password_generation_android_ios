@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -23,7 +24,9 @@ class CustomSignInForm extends StatelessWidget {
           User? user = FirebaseAuth.instance.currentUser;
 
           if (user != null && user.emailVerified) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
+            WidgetsBinding.instance.addPostFrameCallback((_){ //async {
+              //String role = await _fetchUserRole();
+             // context.go("/homeNavBar", extra: role);
               context.go("/otp_verification", extra: "fromLogin");
             });
           } else {
@@ -92,3 +95,16 @@ class CustomSignInForm extends StatelessWidget {
 void _navigateBasedOnRole(BuildContext context, String role) {
   context.go("/homeNavBar", extra: role);
 }
+  Future<String> _fetchUserRole() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) return 'user';
+
+    DocumentSnapshot userDoc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .get();
+
+    if (!userDoc.exists) return 'user';
+
+    return userDoc['role'] ?? 'user';
+  }

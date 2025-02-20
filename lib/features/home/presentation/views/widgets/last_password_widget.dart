@@ -1,21 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:password_gen/features/home/presentation/home_cubit/home_cubit.dart';
+import 'package:password_gen/features/otp_screen/presentation/otp_cubit/otp_cubit.dart';
+
+import '../../../../otp_screen/presentation/views/otp_verification.dart';
 
 class LastPasswordWidget extends StatefulWidget {
-  const LastPasswordWidget({super.key});
+  const LastPasswordWidget({Key? key}) : super(key: key);
 
   @override
   State<LastPasswordWidget> createState() => _LastPasswordWidgetState();
 }
 
 class _LastPasswordWidgetState extends State<LastPasswordWidget> {
-  bool isPasswordVisible = false; // 🔹 Manages password visibility
-
+  bool isPasswordVisible = false; 
   @override
   void initState() {
     super.initState();
-    // 🔹 Fetch password from Firestore when widget initializes
     Future.microtask(() => context.read<HomeCubit>().fetchLastPassword());
   }
 
@@ -30,7 +31,8 @@ class _LastPasswordWidgetState extends State<LastPasswordWidget> {
         } else if (homeState is LastPasswordLoading) {
           return const Center(child: CircularProgressIndicator());
         } else if (homeState is LastPasswordError) {
-          return Text(homeState.message, style: TextStyle(color: Colors.red));
+          return Text(homeState.message,
+              style: const TextStyle(color: Colors.red));
         }
 
         return Container(
@@ -52,19 +54,40 @@ class _LastPasswordWidgetState extends State<LastPasswordWidget> {
                 children: [
                   Expanded(
                     child: Text(
-                      isPasswordVisible ? password : "************", // 🔹 Show or hide password
-                      style: const TextStyle(color: Colors.white, fontSize: 16),
+                      isPasswordVisible ? password : "************",
+                      style:
+                          const TextStyle(color: Colors.white, fontSize: 16),
                     ),
                   ),
                   IconButton(
                     icon: Icon(
-                      isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                      isPasswordVisible
+                          ? Icons.visibility
+                          : Icons.visibility_off,
                       color: Colors.white,
                     ),
-                    onPressed: () {
-                      setState(() {
-                        isPasswordVisible = !isPasswordVisible; // 🔹 Toggle visibility
-                      });
+                    onPressed: () async {
+                      if (!isPasswordVisible) {
+                        final verified = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => BlocProvider(
+                              create: (context) => OtpCubit(),
+                              child: const OtpScreen(
+                                  successRoute: "verifyForPassword"),
+                            ),
+                          ),
+                        );
+                        if (verified == true) {
+                          setState(() {
+                            isPasswordVisible = true;
+                          });
+                        }
+                      } else {
+                        setState(() {
+                          isPasswordVisible = false;
+                        });
+                      }
                     },
                   ),
                 ],
