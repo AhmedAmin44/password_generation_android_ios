@@ -47,3 +47,14 @@ class LastPasswordError extends HomeState {
   final String message;
   LastPasswordError(this.message);
 }
+class UsersFetchLoading extends HomeState {}
+
+class UsersFetchLoaded extends HomeState {
+  final List<Map<String, dynamic>> users;
+  UsersFetchLoaded(this.users);
+}
+
+class UsersFetchError extends HomeState {
+  final String error;
+  UsersFetchError(this.error);
+}
